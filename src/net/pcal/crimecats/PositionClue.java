@@ -3,6 +3,8 @@ package net.pcal.crimecats;
 
 public interface PositionClue {
 
+    String getDescription();
+
     Position[] getPossiblePositions(Solution solution);
 
     public enum Position implements PositionClue {
@@ -25,12 +27,21 @@ public interface PositionClue {
         }
 
         @Override
+        public String getDescription() {
+            return this.description;
+        }
+
+        @Override
         public Position[] getPossiblePositions(Solution solution) {
             return this.possibles;
         }
 
         public int getIndex() {
             return this.pos;
+        }
+
+        public Position[] asArray() {
+            return this.possibles;
         }
     }
 

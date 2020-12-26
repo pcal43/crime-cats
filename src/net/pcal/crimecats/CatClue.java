@@ -2,7 +2,7 @@ package net.pcal.crimecats;
 
 import static net.pcal.crimecats.Cat.*;
 
-public interface CatClue {
+public interface CatClue extends PositionClue {
 
     String getDescription();
 
@@ -34,6 +34,12 @@ public interface CatClue {
         public Cat[] getPossibleCats() {
             return this.cats;
         }
+
+        @Override
+        public Position[] getPossiblePositions(Solution solution) {
+            return null;
+        }
+
     }
 
 }

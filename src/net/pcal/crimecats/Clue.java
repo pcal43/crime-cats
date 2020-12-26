@@ -1,10 +1,15 @@
 package net.pcal.crimecats;
 
-import static net.pcal.crimecats.Preposition.*;
+import static net.pcal.crimecats.Preposition.PrepositionImpl.*;
+import net.pcal.crimecats.PositionClue.Position;
 
 public interface Clue {
 
     boolean matches(Solution solution);
+
+    static Clue createRelative(CatClue cat, Preposition prep, PositionClue pos) {
+        return new ClueImpl(cat,prep,pos);
+    }
 
     static class ClueImpl implements Clue {
 
@@ -12,36 +17,31 @@ public interface Clue {
         private Preposition prep;
         private PositionClue posClue;
 
+        ClueImpl(CatClue cat, Preposition prep, PositionClue pos) {
+            this.catClue = cat;
+            this.prep = prep;
+            this.posClue = pos;
+        }
+
+        private boolean matchesRelative(final Solution sol, CatClue catClue, Preposition prep, PositionClue posClue) {
+        }
+
         @Override
         public boolean matches(final Solution solution) {
-            switch(this.prep) {
-                case AT:
-                    for (PositionClue.Position pos : PositionClue.Position.values()) {
-                        for (Cat cat : this.catClue.getPossibleCats()) {
-                            if (solution.getCatAt(pos) == cat) {
-                                return true;
-                            }
+            for (final Position pos : posClue.getPossiblePositions(solution)) {
+                for(final Position relativePos : prep.getPossibilities(pos)) {
+                    for (final Cat cat : catClue.getPossibleCats()) {
+                        if (solution.getCatAt(relativePos) == cat) {
+                            return true;
                         }
                     }
-                    return false;
-                case NOT_AT:
-                    for (PositionClue.Position pos : PositionClue.Position.values()) {
-                        for (Cat cat : this.catClue.getPossibleCats()) {
-                            if (solution.getCatAt(pos) == cat) {
-                                return false;
-                            }
-                        }
-                    }
-                    return true;
-                case LEFT_OF:
-                case RIGHT_OF:
-                case TWO_AWAY_FROM:
-                case THREE_AWAY_FROM:
-                case ACROSS_FROM:
-                    throw new IllegalStateException();
+                }
             }
-
             return false;
+        }
+
+        public String toString() {
+            return this.catClue.getDescription()+" "+this.prep.getDescription()+" "+this.posClue.getDescription();
         }
     }
 

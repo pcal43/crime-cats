@@ -26,4 +26,10 @@ public enum Cat implements CatClue {
     public Cat[] getPossibleCats() {
         return this.cats;
     }
+
+    @Override
+    public Position[] getPossiblePositions(Solution solution) {
+        return null;
+    }
+
 }
