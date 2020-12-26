@@ -22,28 +22,35 @@ public interface Preposition {
         LEFT_OF() {
             @Override
             public Position[] getPossibilities(Position pos) {
-                return pos;
+                return pos.offset(LEFT_OFFSET).asArray();
             }
         },
 
         RIGHT_OF() {
             @Override
             public Position[] getPossibilities(Position pos) {
-                return pos;
+                return pos.offset(RIGHT_OFFSET).asArray();
+            }
+        },
+
+        NEXT_TO() {
+            @Override
+            public Position[] getPossibilities(Position pos) {
+                return new Position[] {pos.offset(1), pos.offset(-1) };
             }
         },
 
         TWO_AWAY_FROM() {
             @Override
             public Position[] getPossibilities(Position pos) {
-                return pos;
+                return new Position[] {pos.offset(2), pos.offset(-2) };
             }
         },
 
         THREE_AWAY_FROM() {
             @Override
             public Position[] getPossibilities(Position pos) {
-                return pos;
+                return pos.offset(3).asArray();
             }
         },
 

@@ -16,6 +16,9 @@ public interface PositionClue {
         FIVE(5, "Ball of yarn"),
         SIX(6, "Flower pot");
 
+        public static final int LEFT_OFFSET = -1;
+        public static final int RIGHT_OFFSET = 1;
+
         private final String description;
         private final int pos;
         private final Position[] possibles;
@@ -42,6 +45,10 @@ public interface PositionClue {
 
         public Position[] asArray() {
             return this.possibles;
+        }
+
+        public Position offset(int by) {
+            return Position.values()[(this.ordinal()+by) % Position.values().length];
         }
     }
 

@@ -1,6 +1,5 @@
 package net.pcal.crimecats;
 
-import static net.pcal.crimecats.Preposition.PrepositionImpl.*;
 import net.pcal.crimecats.PositionClue.Position;
 
 public interface Clue {
@@ -21,9 +20,6 @@ public interface Clue {
             this.catClue = cat;
             this.prep = prep;
             this.posClue = pos;
-        }
-
-        private boolean matchesRelative(final Solution sol, CatClue catClue, Preposition prep, PositionClue posClue) {
         }
 
         @Override
