@@ -17,10 +17,10 @@ public class CrimeCats {
             out.println("Generating puzzle...");
             out.flush();
             Puzzle puzzle = pg.generate();
-            for(int i=0; i<20;i++) out.println();
+            out.print("\033[H\033[2J");
             puzzle.printPuzzle(out);
             out.println();
-            out.println("Press Enter to see the solution...");
+            out.println("Press Enter to see the answer...");
             scanner.nextLine();
             puzzle.printSolution(out);
             out.println();
