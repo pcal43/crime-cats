@@ -6,6 +6,10 @@ public interface Preposition {
 
     Position[] getPossibilities(Position pos);
 
+    default boolean canHaveCatTarget() {
+        return true;
+    }
+
     String getDescription();
 
     static enum PrepositionImpl implements Preposition {
@@ -21,6 +25,12 @@ public interface Preposition {
             public String getDescription() {
                 return "was sitting in front of";
             }
+
+            @Override
+            public boolean canHaveCatTarget() {
+                return false;
+            }
+
         },
 
         NOT_AT() {
@@ -32,6 +42,11 @@ public interface Preposition {
             @Override
             public String getDescription() {
                 return "was not sitting in front of";
+            }
+
+            @Override
+            public boolean canHaveCatTarget() {
+                return false;
             }
         },
 
@@ -111,7 +126,6 @@ public interface Preposition {
             public String getDescription() {
                 return "was sitting 3 seats from";
             }
-
         },
 
         ACROSS_FROM() {

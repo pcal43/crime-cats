@@ -198,6 +198,13 @@ public class RelativeClue implements Clue {
             for (final Preposition prep : Preposition.PrepositionImpl.values()) {
                 for (final TargetClue tar : targetClues) {
                     if (isIntersection(sub.getPossibleCats(), tar.getPossibleCats())) {
+                        // eliminate cases where subject and target are same, as well as trivial cases where
+                        // subject and target have overlapping feature sets.
+                        // FIXME are there a few interesting cases here we should preserve?
+                        continue;
+                    }
+                    if (!prep.canHaveCatTarget() && tar.getPossibleCats().length > 0) {
+                        // eliminate nonsensical clues like "cat can/cannot be in front of cat"
                         continue;
                     }
                     out.add(new RelativeClue(sub, prep, tar));

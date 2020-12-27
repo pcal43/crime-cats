@@ -9,7 +9,7 @@ public enum PositionFeature {
     CLAW("claw marks", SHOES, BIRD),
     SOCKS("a sock", FISH, FLOWER),
     MOUSE("a mouse", YARN, BIRD),
-    BELL("a bell ball", COFFEE, FISH);
+    BELLBALL("a bell ball", COFFEE, FISH);
 
     private final Position[] positions;
     private final String description;

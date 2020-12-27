@@ -25,16 +25,17 @@ public class PuzzleGenerator {
         random = new Random();
         puzzleSolution = allSolutions.getSolution(rand(allSolutions.getCount()));
     }
-    
+
     private static void debug(String msg) {
         //System.out.println(msg);
     }
 
     public Puzzle generate() {
-        while(true) {
+        while (true) {
             try {
                 return generateOne();
-            } catch(IllegalStateException tryagain) {}
+            } catch (IllegalStateException tryagain) {
+            }
         }
     }
 
@@ -58,7 +59,7 @@ public class PuzzleGenerator {
                     puzzleClues.add(clue);
                     final Collection<Solution> proposedSols = getAllSolutionsMatchedBy(puzzleClues);
                     if (proposedSols.size() > 0) {
-                        if (i < CLUE_COUNT - 1 && proposedSols.size() < currentSols.size() / 2 && proposedSols.size() > currentSols.size() /4) {
+                        if (i < CLUE_COUNT - 1 && proposedSols.size() < currentSols.size() / 2 && proposedSols.size() > currentSols.size() / 4) {
                             debug("i=" + i + " clue chosen, test size was " + proposedSols.size());
                             break;
                         } else if (i == CLUE_COUNT - 1 && proposedSols.size() == 1) {
