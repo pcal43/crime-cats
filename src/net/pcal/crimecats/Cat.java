@@ -1,6 +1,6 @@
 package net.pcal.crimecats;
 
-public enum Cat implements CatClue {
+public enum Cat {
 
     SASSY("Sassy"),
     DUCHESS("Duchess"),
@@ -10,26 +10,17 @@ public enum Cat implements CatClue {
     TOMCAT("Tom Cat");
 
     private final String name;
-    private final Cat[] cats;
+    private final Cat[] array;
 
     Cat(String name) {
         this.name = name;
-        this.cats = new Cat[] {this};
+        this.array = new Cat[] { this };
     }
-
-    @Override
     public String getDescription() {
         return this.name;
     }
 
-    @Override
-    public Cat[] getPossibleCats() {
-        return this.cats;
-    }
+    public Cat[] asArray() { return this.array; }
 
-    @Override
-    public Position[] getPossiblePositions(Solution solution) {
-        return null;
-    }
 
 }

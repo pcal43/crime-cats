@@ -12,8 +12,15 @@ public final class Solution {
         this.positions = positions;
     }
 
-    Cat getCatAt(final PositionClue.Position p) {
+    Cat getCatAt(final Position p) {
         return positions[p.getIndex()];
+    }
+    Position getPositionOf(final Cat cat) {
+        //FIXME stupid
+        for(int i=0; i<this.positions.length;i++) {
+            if (positions[i] == cat) return Position.values()[i];
+        }
+        throw new IllegalStateException();
     }
 
     public String toString() {

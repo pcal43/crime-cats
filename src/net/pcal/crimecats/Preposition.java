@@ -1,8 +1,6 @@
 package net.pcal.crimecats;
 
-import net.pcal.crimecats.PositionClue.Position;
-
-import static net.pcal.crimecats.PositionClue.Position.*;
+import static net.pcal.crimecats.Position.*;
 
 public interface Preposition {
 
