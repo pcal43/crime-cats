@@ -4,7 +4,12 @@ import static net.pcal.crimecats.Position.*;
 
 public enum PositionFeature {
 
-    CATNIP("catnip", ONE,TWO);
+    CATNIP("catnip", SHOES, FLOWER),
+    PAW("a paw print", COFFEE, YARN),
+    CLAW("claw marks", SHOES, BIRD),
+    SOCKS("a sock", FISH, FLOWER),
+    MOUSE("a mouse", YARN, BIRD),
+    BELL("a bell ball", COFFEE, FISH);
 
     private final Position[] positions;
     private final String description;

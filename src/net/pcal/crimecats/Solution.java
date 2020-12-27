@@ -1,5 +1,7 @@
 package net.pcal.crimecats;
 
+import java.io.PrintWriter;
+
 public final class Solution {
 
     static Solution create(Cat[] positions) {
@@ -30,5 +32,11 @@ public final class Solution {
         }
         return out.toString();
 
+    }
+
+    public void print(PrintWriter pw) {
+        for(int i=0; i<positions.length; i++) {
+            pw.println((i+1) + ". " + positions[i].getDescription()+" ("+Position.values()[i].getDescription()+")");
+        }
     }
 }

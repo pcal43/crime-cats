@@ -13,7 +13,6 @@ public class RelativeClue implements Clue {
         System.out.println(clues.size()+" total clues.");
     }
 
-
     private SubjectClue subject;
     private Preposition prep;
     private TargetClue target;
@@ -173,7 +172,7 @@ public class RelativeClue implements Clue {
     }
 
 
-    private static List<RelativeClue> createRelativeClues() {
+    public static List<RelativeClue> createRelativeClues() {
         final List<TargetClue> targetClues = new ArrayList<>();
         final List<SubjectClue> subjectClues = new ArrayList<>();
 
@@ -219,6 +218,8 @@ public class RelativeClue implements Clue {
 
     @Override
     public String toString() {
-        return this.subject.getDescription() + " " + this.prep.getDescription() + " " + this.target.getDescription();
+        String subjectD = subject.getDescription();
+        subjectD = Character.toUpperCase(subjectD.charAt(0)) + subjectD.substring(1);
+        return subjectD + " " + this.prep.getDescription() + " " + this.target.getDescription()+".";
     }
 }

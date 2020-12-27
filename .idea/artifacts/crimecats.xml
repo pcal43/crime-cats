@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="crimecats">
+    <output-path>$PROJECT_DIR$/out/artifacts/crimecats</output-path>
+    <root id="archive" name="crimecats.jar" />
+  </artifact>
+</component>
