@@ -18,16 +18,18 @@ public class PuzzleGenerator {
     private final List<RelativeClue> allClues;
     private final Random random;
     private final Solution puzzleSolution;
+    private final ClueMatcher clueMatcher;
 
     PuzzleGenerator() {
         allSolutions = SolutionLUT.NaiveSolutionLUT.create();
         allClues = RelativeClue.createRelativeClues();
         random = new Random();
         puzzleSolution = allSolutions.getSolution(rand(allSolutions.getCount()));
+        clueMatcher = new ClueMatcher(allSolutions);
     }
 
     private static void debug(String msg) {
-        //System.out.println(msg);
+        System.out.println(msg);
     }
 
     public Puzzle generate() {
@@ -50,25 +52,28 @@ public class PuzzleGenerator {
             if (i == 0) {
                 puzzleClues.add(clue);
             } else {
-                final Collection<Solution> currentSols = getAllSolutionsMatchedBy(puzzleClues);
+                final BitSet currentSols = this.clueMatcher.getSolutionsMatchedByAll(puzzleClues);
                 while (true) {
                     if (safety++ > SAFETY_LIMIT) {
                         debug("hit safety limit, bailing");
                         throw new IllegalStateException("failed to find a solution");
                     }
+                    final BitSet clueSols = this.clueMatcher.getSolutionsMatchedBy(clue);
+                    debug("cardinality="+clueSols.cardinality()+" '"+clue+"'");
+
                     puzzleClues.add(clue);
-                    final Collection<Solution> proposedSols = getAllSolutionsMatchedBy(puzzleClues);
-                    if (proposedSols.size() > 0) {
-                        if (i < CLUE_COUNT - 1 && proposedSols.size() < currentSols.size() / 2 && proposedSols.size() > currentSols.size() / 4) {
-                            debug("i=" + i + " clue chosen, test size was " + proposedSols.size());
+                    final BitSet proposedSols = this.clueMatcher.getSolutionsMatchedByAll(puzzleClues);
+                    if (proposedSols.cardinality() > 0) {
+                        if (i < CLUE_COUNT - 1 && proposedSols.cardinality() < currentSols.cardinality() / 2 && proposedSols.cardinality() > currentSols.cardinality() / 4) {
+                            debug("i=" + i + " clue chosen, test cardinality was " + proposedSols.cardinality());
                             break;
-                        } else if (i == CLUE_COUNT - 1 && proposedSols.size() == 1) {
-                            debug("i=" + i + " clue chosen, test size was " + proposedSols.size());
+                        } else if (i == CLUE_COUNT - 1 && proposedSols.cardinality() == 1) {
+                            debug("i=" + i + " clue chosen, test cardinality was " + proposedSols.cardinality());
                             break;
                         }
                     }
                     puzzleClues.remove(clue);
-                    debug("i=" + i + " picking a new clue, test size was " + proposedSols.size());
+                    debug("i=" + i + " picking a new clue, test cardinality was " + proposedSols.cardinality());
                     clue = pickRandomClue();
                 }
             }
@@ -85,20 +90,40 @@ public class PuzzleGenerator {
         }
     }
 
-    private Set<Solution> getAllSolutionsMatchedBy(List<Clue> clues) {
-        final Set<Solution> out = new HashSet<>();
-        for (int i = 0; i < this.allSolutions.getCount(); i++) {
-            final Solution sol = this.allSolutions.getSolution(i);
-            if (matchesAll(sol, clues)) out.add(sol);
-        }
-        return out;
-    }
+    private static class ClueMatcher {
 
-    private boolean matchesAll(Solution sol, List<Clue> clues) {
-        for (Clue clue : clues) {
-            if (!clue.matches(sol)) return false;
+        private Map<Clue, BitSet> matchCache = new HashMap<>();
+        private SolutionLUT allSolutions;
+
+        ClueMatcher(SolutionLUT allSolutions) {
+            this.allSolutions = allSolutions;
         }
-        return true;
+
+        private BitSet getSolutionsMatchedByAll(List<Clue> clues) {
+            BitSet out = null;
+            for(Clue  clue : clues) {
+                if (out == null) {
+                    out = (BitSet)getSolutionsMatchedBy(clue).clone();
+                } else {
+                    out.and(getSolutionsMatchedBy(clue));
+                }
+            }
+            return out;
+        }
+
+        private BitSet getSolutionsMatchedBy(Clue clue) {
+            BitSet out = this.matchCache.get(clue);
+            if (out != null) {
+                return out;
+            } else {
+                out = new BitSet(allSolutions.getCount());
+                for (int i = 0; i < allSolutions.getCount(); i++) {
+                    if (clue.matches(allSolutions.getSolution(i))) out.set(i);
+                }
+                this.matchCache.put(clue, out);
+            }
+            return out;
+        }
     }
 
     private int rand(int max) {
