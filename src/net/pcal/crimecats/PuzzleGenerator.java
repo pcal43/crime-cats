@@ -26,10 +26,17 @@ public class PuzzleGenerator {
         random = new Random();
         puzzleSolution = allSolutions.getSolution(rand(allSolutions.getCount()));
         clueMatcher = new ClueMatcher(allSolutions);
+        if (true) {
+            for(Clue clue : allClues) {
+                BitSet b = clueMatcher.getSolutionsMatchedBy(clue);
+                System.out.println("cardinality="+b.cardinality()+" for '"+clue+"'");
+            }
+            System.out.println(allClues.size()+" clues total");
+        }
     }
 
     private static void debug(String msg) {
-        System.out.println(msg);
+        //System.out.println(msg);
     }
 
     public Puzzle generate() {

@@ -1,6 +1,7 @@
 package net.pcal.crimecats;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 public class RelativeClue implements Clue {
@@ -20,19 +21,20 @@ public class RelativeClue implements Clue {
 
     @Override
     public boolean matches(final Solution sol) {
-        for (final Position pos : subject.getSubjectPositions(sol)) {
-            for (final Position relativePos : prep.getPossibilities(pos)) {
-                if (this.target.matches(sol, relativePos)) {
-                    return true;
-                }
+        for (final Position relativePos : prep.getPossibilities(subject.getPossiblePositions(sol))) {
+            if (this.target.matches(sol, relativePos)) {
+                return true;
             }
         }
         return false;
     }
 
-    private interface SubjectClue {
-        Position[] getSubjectPositions(Solution sol);
 
+    private interface SubjectClue {
+
+        EnumSet<Position> getPossiblePositions(Solution sol);
+
+        // FIXME this is only used for bogus clue filtering, should be narrowed or moved to a different interface
         Cat[] getPossibleCats();
 
         String getDescription();
@@ -55,13 +57,13 @@ public class RelativeClue implements Clue {
         }
 
         @Override
-        public Position[] getSubjectPositions(Solution sol) {
+        public EnumSet<Position> getPossiblePositions(Solution sol) {
             return sol.getPositionOf(this.cat).asArray();
         }
 
         @Override
-        public boolean matches(Solution solution, Position p) {
-            return false;
+        public boolean matches(Solution sol, Position p) {
+            return sol.getPositionOf(this.cat) == p;
         }
 
         @Override
@@ -84,11 +86,11 @@ public class RelativeClue implements Clue {
         }
 
         @Override
-        public Position[] getSubjectPositions(Solution sol) {
+        public EnumSet<Position> getPossiblePositions(Solution sol) {
             final Cat[] cats = this.catFeature.getPossibleCats();
-            final Position[] out = new Position[cats.length];
-            for (int i = 0; i < out.length; i++) {
-                out[i] = sol.getPositionOf(cats[i]);
+            final EnumSet<Position> out = EnumSet.noneOf(Position.class);
+            for (int i = 0; i < cats.length; i++) {
+                out.add(sol.getPositionOf(cats[i]));
             }
             return out;
         }
@@ -229,4 +231,5 @@ public class RelativeClue implements Clue {
         subjectD = Character.toUpperCase(subjectD.charAt(0)) + subjectD.substring(1);
         return subjectD + " " + this.prep.getDescription() + " " + this.target.getDescription()+".";
     }
+
 }

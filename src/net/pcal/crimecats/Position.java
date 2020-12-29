@@ -1,5 +1,7 @@
 package net.pcal.crimecats;
 
+import java.util.EnumSet;
+
 public enum Position {
 
     BIRD(0, "the birdcage", "Who ate the bird?"),
@@ -18,28 +20,17 @@ public enum Position {
             COFFEE
     };
 
-    private static final Position[][] INVERSION = {
-            {COFFEE, SHOES, FISH, YARN, FLOWER},
-            {BIRD, SHOES, FISH, YARN, FLOWER},
-            {BIRD, COFFEE, FISH, YARN, FLOWER},
-            {BIRD, COFFEE, SHOES, YARN, FLOWER},
-            {BIRD, COFFEE, SHOES, FISH, FLOWER},
-            {BIRD, COFFEE, SHOES, FISH, YARN}
-    };
-
-
     public static final int LEFT_OFFSET = -1;
     public static final int RIGHT_OFFSET = 1;
 
     private final String description;
     private final int pos;
-    private final Position[] array;
+    private  EnumSet<Position> array;
     private final String crime;
 
     private Position(int pos, String description, String crime) {
         this.pos = pos;
         this.description = description;
-        this.array = new net.pcal.crimecats.Position[]{this};
         this.crime = crime;
     }
 
@@ -55,12 +46,11 @@ public enum Position {
         return this.pos;
     }
 
-    public Position[] asArray() {
+    public EnumSet<Position> asArray() {
+        if (this.array == null) {
+            this.array = EnumSet.of(this);
+        }
         return this.array;
-    }
-
-    public Position[] getInversion() {
-        return INVERSION[this.ordinal()];
     }
 
     public Position getAcross() {
