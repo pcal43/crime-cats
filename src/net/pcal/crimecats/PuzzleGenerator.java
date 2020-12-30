@@ -6,37 +6,22 @@ import java.util.*;
 public class PuzzleGenerator {
 
     public static void main(String[] args) {
-        PuzzleGenerator pg = new PuzzleGenerator();
-        Puzzle puzzle = pg.generate();
-        PrintWriter out = new PrintWriter(System.out);
+        final PuzzleGenerator pg = new PuzzleGenerator();
+        final Puzzle puzzle = pg.generate();
+        final PrintWriter out = new PrintWriter(System.out);
         puzzle.printPuzzle(out);
         puzzle.printSolution(out);
         out.flush();
     }
 
     private final SolutionLUT allSolutions;
-    private final List<RelativeClue> allClues;
     private final Random random;
-    private final Solution puzzleSolution;
-    private final ClueMatcher clueMatcher;
+    private final List<MatchedClue> allClues;
 
     PuzzleGenerator() {
         allSolutions = SolutionLUT.NaiveSolutionLUT.create();
-        allClues = RelativeClue.createRelativeClues();
         random = new Random();
-        puzzleSolution = allSolutions.getSolution(rand(allSolutions.getCount()));
-        clueMatcher = new ClueMatcher(allSolutions);
-        if (true) {
-            for(Clue clue : allClues) {
-                BitSet b = clueMatcher.getSolutionsMatchedBy(clue);
-                System.out.println("cardinality="+b.cardinality()+" for '"+clue+"'");
-            }
-            System.out.println(allClues.size()+" clues total");
-        }
-    }
-
-    private static void debug(String msg) {
-        //System.out.println(msg);
+        allClues = generateMatchedClueLUT(allSolutions, RelativeClue.createRelativeClues());
     }
 
     public Puzzle generate() {
@@ -49,27 +34,34 @@ public class PuzzleGenerator {
     }
 
     private Puzzle generateOne() {
+        final int puzzleSolutionIndex = rand(allSolutions.getCount());
+        final List<MatchedClue> matchingClues = new ArrayList<>();
+        for (final MatchedClue mc : this.allClues) {
+            if (mc.getSolvedSolutions().get(puzzleSolutionIndex)) {
+                matchingClues.add(mc);
+            }
+        }
+        debug("Solution Index = " + puzzleSolutionIndex + ", " + matchingClues.size() + " matching clues identified");
         final Position crime = Position.values()[rand(Position.values().length)];
-        final List<Clue> puzzleClues = new ArrayList<>();
+        final List<MatchedClue> puzzleClues = new ArrayList<>();
         final int CLUE_COUNT = 6;
         final int SAFETY_LIMIT = 10000;
         int safety = 0;
         for (int i = 0; i < CLUE_COUNT; i++) {
-            Clue clue = pickRandomClue();
             if (i == 0) {
+                final MatchedClue clue = matchingClues.get(rand(matchingClues.size()));
                 puzzleClues.add(clue);
             } else {
-                final BitSet currentSols = this.clueMatcher.getSolutionsMatchedByAll(puzzleClues);
+                final BitSet currentSols = (BitSet)puzzleClues.get(0).getSolvedSolutions().clone();
+                for(int j=1; j<puzzleClues.size(); j++) {
+                    currentSols.and(puzzleClues.get(j).getSolvedSolutions());
+                }
                 while (true) {
-                    if (safety++ > SAFETY_LIMIT) {
-                        debug("hit safety limit, bailing");
-                        throw new IllegalStateException("failed to find a solution");
-                    }
-                    final BitSet clueSols = this.clueMatcher.getSolutionsMatchedBy(clue);
-                    debug("cardinality="+clueSols.cardinality()+" '"+clue+"'");
-
+                    final MatchedClue clue = matchingClues.get(rand(matchingClues.size()));
+                    debug("cardinality=" + clue.getSolvedSolutions().cardinality() + " '" + clue.getClue() + "'");
                     puzzleClues.add(clue);
-                    final BitSet proposedSols = this.clueMatcher.getSolutionsMatchedByAll(puzzleClues);
+                    final BitSet proposedSols = ((BitSet) currentSols.clone());
+                    proposedSols.and(clue.getSolvedSolutions());
                     if (proposedSols.cardinality() > 0) {
                         if (i < CLUE_COUNT - 1 && proposedSols.cardinality() < currentSols.cardinality() / 2 && proposedSols.cardinality() > currentSols.cardinality() / 4) {
                             debug("i=" + i + " clue chosen, test cardinality was " + proposedSols.cardinality());
@@ -79,62 +71,81 @@ public class PuzzleGenerator {
                             break;
                         }
                     }
+                    if (safety++ > SAFETY_LIMIT) {
+                        debug("hit safety limit, bailing");
+                        throw new IllegalStateException("failed to find a solution");
+                    }
                     puzzleClues.remove(clue);
-                    debug("i=" + i + " picking a new clue, test cardinality was " + proposedSols.cardinality());
-                    clue = pickRandomClue();
+                    debug("i=" + i + " picking a new clue, proposed cardinality was " + proposedSols.cardinality());
                 }
             }
         }
-        return new Puzzle(crime, this.puzzleSolution, puzzleClues);
-    }
-
-    private Clue pickRandomClue() {
-        while (true) {
-            final Clue clue = allClues.get(rand(allClues.size()));
-            if (clue.matches(this.puzzleSolution)) {
-                return clue;
-            }
+        final List<Clue> finalPuzzleClues = new ArrayList<>();
+        for (MatchedClue mc : puzzleClues) {
+            finalPuzzleClues.add(mc.getClue());
         }
-    }
-
-    private static class ClueMatcher {
-
-        private Map<Clue, BitSet> matchCache = new HashMap<>();
-        private SolutionLUT allSolutions;
-
-        ClueMatcher(SolutionLUT allSolutions) {
-            this.allSolutions = allSolutions;
-        }
-
-        private BitSet getSolutionsMatchedByAll(List<Clue> clues) {
-            BitSet out = null;
-            for(Clue  clue : clues) {
-                if (out == null) {
-                    out = (BitSet)getSolutionsMatchedBy(clue).clone();
-                } else {
-                    out.and(getSolutionsMatchedBy(clue));
-                }
-            }
-            return out;
-        }
-
-        private BitSet getSolutionsMatchedBy(Clue clue) {
-            BitSet out = this.matchCache.get(clue);
-            if (out != null) {
-                return out;
-            } else {
-                out = new BitSet(allSolutions.getCount());
-                for (int i = 0; i < allSolutions.getCount(); i++) {
-                    if (clue.matches(allSolutions.getSolution(i))) out.set(i);
-                }
-                this.matchCache.put(clue, out);
-            }
-            return out;
-        }
+        return new Puzzle(crime, this.allSolutions.getSolution(puzzleSolutionIndex), finalPuzzleClues);
     }
 
     private int rand(int max) {
         return random.nextInt(max);
     }
 
+    private static void debug(String msg) {
+        System.out.println(msg);
+    }
+
+    private static List<MatchedClue> generateMatchedClueLUT(final SolutionLUT allSolutions, final List<? extends Clue> allClues) {
+        final long start = System.currentTimeMillis();
+        final List<MatchedClue> out = new ArrayList<>();
+        for(final Clue clue : allClues) {
+            final BitSet bs = new BitSet();
+            for (int i = 0; i < allSolutions.getCount(); i++) {
+                if (clue.matches(allSolutions.getSolution(i))) bs.set(i);
+            }
+            out.add(new MatchedClue(clue, bs));
+        }
+        Collections.sort(out);
+        for(int i=0; i<out.size(); i++) {
+            MatchedClue mc = out.get(i);
+            debug(i+" cardinality="+mc.getSolvedSolutions().cardinality()+" - "+mc.clue.toString());
+        }
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("Precached matches for "+allClues.size() + " clues in "+duration+"ms");
+        return out;
+    }
+
+    private static class MatchedClue implements Comparable<MatchedClue> {
+
+        private final Clue clue;
+        private final BitSet solvedSolutions;
+
+        public MatchedClue(Clue clue, BitSet solvedSolutions) {
+            this.clue = clue;
+            this.solvedSolutions = solvedSolutions;
+        }
+
+        public BitSet getSolvedSolutions() {
+            return this.solvedSolutions;
+        }
+
+        public Clue getClue() {
+            return this.clue;
+        }
+
+        @Override
+        public int hashCode() {
+            return this.clue.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof MatchedClue && this.clue.equals(((MatchedClue)o).clue);
+        }
+
+        @Override
+        public int compareTo(MatchedClue o) {
+            return Integer.compare(this.solvedSolutions.cardinality(), o.solvedSolutions.cardinality());
+        }
+    }
 }
