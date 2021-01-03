@@ -5,7 +5,8 @@ import java.util.*;
 
 public class PuzzleGenerator {
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false
+            ;
 
     public static void main(String[] args) {
         final PuzzleGenerator pg = new PuzzleGenerator();
@@ -96,26 +97,33 @@ public class PuzzleGenerator {
         return i.next();
     }
 
-    private static void removeInvalidCandidates(List<MatchedClue> currentClues, Set<MatchedClue> remainingClues) {
-        final BitSet allSolved = getSolutions(currentClues);
-        final BitSet[] exclusives = getSolitionsExclusiveOfEach(currentClues);
-        final Iterator<MatchedClue> r = remainingClues.iterator();
+    private static void removeInvalidCandidates(List<MatchedClue> currentPuzzleClues, Set<MatchedClue> candidates) {
+        final BitSet currentSolutions = getSolutions(currentPuzzleClues);
+        final int currentCardinality = currentSolutions.cardinality();
+        final BitSet[] exclusives = getSolitionsExclusiveOfEach(currentPuzzleClues);
+        final Iterator<MatchedClue> ci = candidates.iterator();
         outer:
-        while(r.hasNext()) {
-            final MatchedClue remaining = r.next();
-            final BitSet remainingUnique = (BitSet)remaining.getSolvedSolutions().clone();
-            remainingUnique.(allSolved);
-            if (remainingUnique.isEmpty()) {
-                debug("removing '"+remaining+" because it doesn't constrain the solution set");
-                r.remove();
+        while(ci.hasNext()) {
+            final MatchedClue candidate = ci.next();
+            final BitSet solutionsWithCandidate = (BitSet)currentSolutions.clone();
+            solutionsWithCandidate.andNot(candidate.getSolvedSolutions());
+            if (solutionsWithCandidate.cardinality() == currentCardinality) {
+                // if adding the clue to the current puzzle doesn't reduce the cardinality of the solution set
+                // then it's never going to contribute anything, so let's not bother with it anymore
+                debug("removing '"+candidate+" because it doesn't constrain the solution set");
+                ci.remove();
                 break outer;
             }
             for (int i = 0; i < exclusives.length; i++) {
-                final BitSet exclusive = (BitSet) exclusives[i].clone();
-                exclusive.andNot(remaining.getSolvedSolutions());
-                if (exclusive.isEmpty()) {
-                    debug("removing '"+remaining+" because it obviates '"+currentClues.get(i)+"'");
-                    r.remove();
+                final BitSet candidateSolutions = (BitSet)candidate.getSolvedSolutions().clone();
+                candidateSolutions.andNot(exclusives[i]);
+                if (candidateSolutions.isEmpty()) {
+                    // If the solutions matched by the candidate clue are a subset of the solutions uniquely matched
+                    // by one of the puzzle clues, then that candidate rules out all of the solutions that the
+                    // already-chosen clue does, rendering that clue useless.  In the case, let's also discard
+                    // the candidate from further  consideration.
+                    debug("removing '"+candidate+" because it obviates '"+currentPuzzleClues.get(i)+"'");
+                    ci.remove();
                     break outer;
                 }
             }
