@@ -13,13 +13,13 @@ public class CrimeCats {
         out.println("--------------------------");
         out.println();
         PuzzleGenerator pg = new PuzzleGenerator();
-        while(true) {
+        while (true) {
             PuzzleDifficulty difficulty;
-            while(true) {
+            while (true) {
                 out.print("\033[H\033[2J"); // clear screen
                 out.println("Enter difficulty:");
-                for(final PuzzleDifficulty d : PuzzleDifficulty.values()) {
-                    out.println(" "+(d.ordinal()+1)+") "+d.getLabel());
+                for (final PuzzleDifficulty d : PuzzleDifficulty.values()) {
+                    out.println(" " + (d.ordinal() + 1) + ") " + d.getLabel());
                 }
                 out.println(" 0) Quit");
                 try {
@@ -30,14 +30,14 @@ public class CrimeCats {
                     }
                     difficulty = PuzzleDifficulty.values()[selected - 1];
                     break;
-                } catch(Exception e) {
+                } catch (Exception e) {
                     out.println("try again\n4");
                 } finally {
                     scanner.nextLine();
                 }
             }
             out.println();
-            out.println("Generating "+difficulty.getLabel()+" puzzle...");
+            out.println("Generating " + difficulty.getLabel() + " puzzle...");
             out.flush();
             final Puzzle puzzle = pg.generate(difficulty);
             out.println();

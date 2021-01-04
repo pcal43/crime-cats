@@ -14,13 +14,16 @@ public enum Cat {
 
     Cat(String name) {
         this.name = name;
-        this.array = new Cat[] { this };
+        this.array = new Cat[]{this};
     }
+
     public String getDescription() {
         return this.name;
     }
 
-    public Cat[] asArray() { return this.array; }
+    public Cat[] asArray() {
+        return this.array;
+    }
 
 
 }

@@ -12,7 +12,7 @@ public enum PuzzleDifficulty {
     private final String label;
     private final ClueDifficulty[] clueRanges;
 
-    PuzzleDifficulty(final String label, ClueDifficulty... clueRanges){
+    PuzzleDifficulty(final String label, ClueDifficulty... clueRanges) {
         this.label = label;
         this.clueRanges = clueRanges;
     }

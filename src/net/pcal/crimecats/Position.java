@@ -25,7 +25,7 @@ public enum Position {
 
     private final String description;
     private final int pos;
-    private  EnumSet<Position> array;
+    private EnumSet<Position> array;
     private final String crime;
 
     private Position(int pos, String description, String crime) {
@@ -37,7 +37,7 @@ public enum Position {
     public String getDescription() {
         return this.description;
     }
-    
+
     public String getCrime() {
         return this.crime;
     }

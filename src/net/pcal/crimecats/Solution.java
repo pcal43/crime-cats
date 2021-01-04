@@ -17,9 +17,10 @@ public final class Solution {
     Cat getCatAt(final Position p) {
         return positions[p.getIndex()];
     }
+
     Position getPositionOf(final Cat cat) {
         //FIXME stupid
-        for(int i=0; i<this.positions.length;i++) {
+        for (int i = 0; i < this.positions.length; i++) {
             if (positions[i] == cat) return Position.values()[i];
         }
         throw new IllegalStateException();
@@ -27,16 +28,16 @@ public final class Solution {
 
     public String toString() {
         final StringBuilder out = new StringBuilder();
-        for(Cat cat : this.positions) {
-            out.append(cat.name()+",");
+        for (Cat cat : this.positions) {
+            out.append(cat.name() + ",");
         }
         return out.toString();
 
     }
 
     public void print(PrintWriter pw) {
-        for(int i=0; i<positions.length; i++) {
-            pw.println((i+1) + ". " + positions[i].getDescription()+" ("+Position.values()[i].getDescription()+")");
+        for (int i = 0; i < positions.length; i++) {
+            pw.println((i + 1) + ". " + positions[i].getDescription() + " (" + Position.values()[i].getDescription() + ")");
         }
     }
 }

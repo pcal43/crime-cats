@@ -94,13 +94,13 @@ public class PuzzleGenerator {
         final List<MatchedClue> clues = new ArrayList<>(cluesOriginal);
         Collections.shuffle(clues);
         final Iterator<MatchedClue> i = clues.iterator();
-        while(i.hasNext()) {
+        while (i.hasNext()) {
             final MatchedClue clue = i.next();
             if (!d.matches(clue.getSolvedSolutions().cardinality(), solutionCount)) {
                 i.remove();
             }
         }
-        if (clues.size() == 0){
+        if (clues.size() == 0) {
             throw new IllegalStateException("could not find valid clue");
         }
         return clues.get(rand(clues.size()));
@@ -112,26 +112,26 @@ public class PuzzleGenerator {
         final BitSet[] exclusives = getUniqueSolutionsForEach(currentPuzzleClues);
         final Iterator<MatchedClue> ci = candidates.iterator();
         outer:
-        while(ci.hasNext()) {
+        while (ci.hasNext()) {
             final MatchedClue candidate = ci.next();
-            final BitSet solutionsWithCandidate = (BitSet)currentSolutions.clone();
+            final BitSet solutionsWithCandidate = (BitSet) currentSolutions.clone();
             solutionsWithCandidate.andNot(candidate.getSolvedSolutions());
             if (solutionsWithCandidate.cardinality() == currentCardinality) {
                 // if adding the clue to the current puzzle doesn't reduce the cardinality of the solution set
                 // then it's never going to contribute anything, so let's not bother with it anymore
-                debug("removing '"+candidate+" because it doesn't constrain the solution set");
+                debug("removing '" + candidate + " because it doesn't constrain the solution set");
                 ci.remove();
                 break outer;
             }
             for (int i = 0; i < exclusives.length; i++) {
-                final BitSet candidateSolutions = (BitSet)candidate.getSolvedSolutions().clone();
+                final BitSet candidateSolutions = (BitSet) candidate.getSolvedSolutions().clone();
                 candidateSolutions.andNot(exclusives[i]);
                 if (candidateSolutions.isEmpty()) {
                     // If the solutions matched by the candidate clue are a subset of the solutions uniquely matched
                     // by one of the puzzle clues, then that candidate rules out all of the solutions that the
                     // already-chosen clue does, rendering that clue useless.  In the case, let's also discard
                     // the candidate from further  consideration.
-                    debug("removing '"+candidate+" because it obviates '"+currentPuzzleClues.get(i)+"'");
+                    debug("removing '" + candidate + " because it obviates '" + currentPuzzleClues.get(i) + "'");
                     ci.remove();
                     break outer;
                 }
@@ -151,7 +151,7 @@ public class PuzzleGenerator {
     private static BitSet[] getUniqueSolutionsForEach(List<MatchedClue> clues) {
         final BitSet[] exclusives = new BitSet[clues.size()];
         for (int i = 0; i < clues.size(); i++) {
-            exclusives[i] = (BitSet)clues.get(i).getSolvedSolutions().clone();
+            exclusives[i] = (BitSet) clues.get(i).getSolvedSolutions().clone();
             for (int j = 0; j < clues.size(); j++) {
                 if (i != j) exclusives[i].and(clues.get(j).getSolvedSolutions());
             }

@@ -13,10 +13,10 @@ public interface SolutionLUT {
 
     public static void main(String[] args) {
         final SolutionLUT lut = NaiveSolutionLUT.create();
-        for (int i=0; i<lut.getCount();i++) {
+        for (int i = 0; i < lut.getCount(); i++) {
             System.out.println(lut.getSolution(i));
         }
-        System.out.println(lut.getCount()+" total solutions");
+        System.out.println(lut.getCount() + " total solutions");
     }
 
 
@@ -67,7 +67,7 @@ public interface SolutionLUT {
                 } else {
                     // If size is even, swap ith and
                     // (size-1)th i.e (last) element
-                    swap(cats, i, size -1 );
+                    swap(cats, i, size - 1);
                 }
             }
         }

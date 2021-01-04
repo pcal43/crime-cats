@@ -2,7 +2,8 @@ package net.pcal.crimecats;
 
 import java.util.EnumSet;
 
-import static net.pcal.crimecats.Position.*;
+import static net.pcal.crimecats.Position.LEFT_OFFSET;
+import static net.pcal.crimecats.Position.RIGHT_OFFSET;
 
 public interface Preposition {
 
@@ -17,7 +18,6 @@ public interface Preposition {
     static enum PrepositionImpl implements Preposition {
 
         AT() {
-
             @Override
             public EnumSet<Position> getPossibilities(EnumSet<Position> subjectPositions) {
                 return subjectPositions;
@@ -56,11 +56,12 @@ public interface Preposition {
             @Override
             public EnumSet<Position> getPossibilities(EnumSet<Position> subjectPositions) {
                 EnumSet<Position> out = EnumSet.noneOf(Position.class);
-                for(Position p : subjectPositions) {
+                for (Position p : subjectPositions) {
                     out.add(p.offset(LEFT_OFFSET));
                 }
                 return out;
             }
+
             @Override
             public String getDescription() {
                 return "was sitting to the left of";
@@ -69,13 +70,14 @@ public interface Preposition {
 
         NOT_LEFT_OF() {
             @Override
-            public  EnumSet<Position> getPossibilities(EnumSet<Position> subjectPositions) {
+            public EnumSet<Position> getPossibilities(EnumSet<Position> subjectPositions) {
                 EnumSet<Position> out = EnumSet.allOf(Position.class);
-                for(Position p : subjectPositions) {
+                for (Position p : subjectPositions) {
                     out.remove(p.offset(LEFT_OFFSET));
                 }
                 return out;
             }
+
             @Override
             public String getDescription() {
                 return "was not sitting to the left of";
@@ -84,13 +86,14 @@ public interface Preposition {
 
         RIGHT_OF() {
             @Override
-            public  EnumSet<Position> getPossibilities(EnumSet<Position> subjectPositions) {
+            public EnumSet<Position> getPossibilities(EnumSet<Position> subjectPositions) {
                 EnumSet<Position> out = EnumSet.noneOf(Position.class);
-                for(Position p : subjectPositions) {
+                for (Position p : subjectPositions) {
                     out.add(p.offset(RIGHT_OFFSET));
                 }
                 return out;
             }
+
             @Override
             public String getDescription() {
                 return "was sitting to the right of";
@@ -99,13 +102,14 @@ public interface Preposition {
 
         NOT_RIGHT_OF() {
             @Override
-            public  EnumSet<Position> getPossibilities(EnumSet<Position> subjectPositions) {
+            public EnumSet<Position> getPossibilities(EnumSet<Position> subjectPositions) {
                 EnumSet<Position> out = EnumSet.allOf(Position.class);
-                for(Position p : subjectPositions) {
+                for (Position p : subjectPositions) {
                     out.remove(p.offset(RIGHT_OFFSET));
                 }
                 return out;
             }
+
             @Override
             public String getDescription() {
                 return "was not sitting to the right of";
@@ -114,14 +118,15 @@ public interface Preposition {
 
         NEXT_TO() {
             @Override
-            public  EnumSet<Position> getPossibilities(EnumSet<Position> subjectPositions) {
+            public EnumSet<Position> getPossibilities(EnumSet<Position> subjectPositions) {
                 EnumSet<Position> out = EnumSet.noneOf(Position.class);
-                for(Position p : subjectPositions) {
+                for (Position p : subjectPositions) {
                     out.add(p.offset(1));
                     out.add(p.offset(-1));
                 }
                 return out;
             }
+
             @Override
             public String getDescription() {
                 return "was sitting next to";
@@ -130,14 +135,15 @@ public interface Preposition {
 
         NOT_NEXT_TO() {
             @Override
-            public  EnumSet<Position> getPossibilities(EnumSet<Position> subjectPositions) {
+            public EnumSet<Position> getPossibilities(EnumSet<Position> subjectPositions) {
                 EnumSet<Position> out = EnumSet.allOf(Position.class);
-                for(Position p : subjectPositions) {
+                for (Position p : subjectPositions) {
                     out.remove(p.offset(1));
                     out.remove(p.offset(-1));
                 }
                 return out;
             }
+
             @Override
             public String getDescription() {
                 return "was not sitting next to";
@@ -148,12 +154,13 @@ public interface Preposition {
             @Override
             public EnumSet<Position> getPossibilities(EnumSet<Position> subjectPositions) {
                 EnumSet<Position> out = EnumSet.noneOf(Position.class);
-                for(Position p : subjectPositions) {
+                for (Position p : subjectPositions) {
                     out.add(p.offset(2));
                     out.add(p.offset(-2));
                 }
                 return out;
             }
+
             @Override
             public String getDescription() {
                 return "was sitting 2 seats from";
@@ -165,11 +172,12 @@ public interface Preposition {
             @Override
             public EnumSet<Position> getPossibilities(EnumSet<Position> subjectPositions) {
                 EnumSet<Position> out = EnumSet.noneOf(Position.class);
-                for(Position p : subjectPositions) {
+                for (Position p : subjectPositions) {
                     out.add(p.offset(3));
                 }
                 return out;
             }
+
             @Override
             public String getDescription() {
                 return "was sitting 3 seats from";
@@ -180,11 +188,12 @@ public interface Preposition {
             @Override
             public EnumSet<Position> getPossibilities(EnumSet<Position> subjectPositions) {
                 final EnumSet<Position> out = EnumSet.noneOf(Position.class);
-                for(Position p : subjectPositions) {
+                for (Position p : subjectPositions) {
                     out.add(p.getAcross());
                 }
                 return out;
             }
+
             @Override
             public String getDescription() {
                 return "was sitting across from";
@@ -195,7 +204,7 @@ public interface Preposition {
             @Override
             public EnumSet<Position> getPossibilities(EnumSet<Position> subjectPositions) {
                 final EnumSet<Position> out = EnumSet.allOf(Position.class);
-                for(Position p : subjectPositions) {
+                for (Position p : subjectPositions) {
                     out.remove(p.getAcross());
                 }
                 return out;

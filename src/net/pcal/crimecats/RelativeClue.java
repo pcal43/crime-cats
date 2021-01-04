@@ -8,10 +8,10 @@ public class RelativeClue implements Clue {
 
     public static void main(String[] args) {
         final List<RelativeClue> clues = createRelativeClues();
-        for(Clue clue : clues) {
+        for (Clue clue : clues) {
             System.out.println(clue);
         }
-        System.out.println(clues.size()+" total clues.");
+        System.out.println(clues.size() + " total clues.");
     }
 
     private SubjectClue subject;
@@ -229,7 +229,7 @@ public class RelativeClue implements Clue {
     public String toString() {
         String subjectD = subject.getDescription();
         subjectD = Character.toUpperCase(subjectD.charAt(0)) + subjectD.substring(1);
-        return subjectD + " " + this.prep.getDescription() + " " + this.target.getDescription()+".";
+        return subjectD + " " + this.prep.getDescription() + " " + this.target.getDescription() + ".";
     }
 
 }

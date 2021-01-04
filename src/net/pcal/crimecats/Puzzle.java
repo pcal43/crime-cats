@@ -35,7 +35,7 @@ public class Puzzle {
     public void printSolution(PrintWriter pw) {
         Cat guilty = this.solution.getCatAt(this.crime);
         pw.println("----------------------------------");
-        pw.println("The guilty cat is..."+guilty.getDescription()+"!");
+        pw.println("The guilty cat is..." + guilty.getDescription() + "!");
         pw.println("----------------------------------");
         this.solution.print(pw);
     }
