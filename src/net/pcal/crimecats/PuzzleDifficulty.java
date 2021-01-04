@@ -5,9 +5,9 @@ import static net.pcal.crimecats.PuzzleDifficulty.ClueDifficulty.*;
 public enum PuzzleDifficulty {
 
     BEGINNER("Beginner", EASY, EASY, EASY, EASY, EASY),
-    INTERMEDIATE("Intermediate", EASY, MEDIUM, EASY, MEDIUM, EASY, MEDIUM);
-//    ADVANCED("Advanced",new int[][] {{0, 120}}),
-//    EXPERT("Expert",new int[][] {{0, 120}});
+    INTERMEDIATE("Intermediate", EASY, MEDIUM, EASY, MEDIUM, EASY, MEDIUM),
+    ADVANCED("Advanced", MEDIUM, MEDIUM, HARD, MEDIUM, MEDIUM, HARD),
+    EXPERT("Expert", HARD, HARD, HARD, HARD, HARD, HARD, HARD);
 
     private final String label;
     private final ClueDifficulty[] clueRanges;
@@ -15,6 +15,10 @@ public enum PuzzleDifficulty {
     PuzzleDifficulty(final String label, ClueDifficulty... clueRanges){
         this.label = label;
         this.clueRanges = clueRanges;
+    }
+
+    public String getLabel() {
+        return this.label;
     }
 
     public int getClueCount() {
@@ -26,7 +30,7 @@ public enum PuzzleDifficulty {
     }
 
     public enum ClueDifficulty {
-        EASY(0, 240),
+        EASY(0, 220),
         MEDIUM(121, 520),
         HARD(340, 720);
 
@@ -36,8 +40,8 @@ public enum PuzzleDifficulty {
             this.min = min;
             this.max = max;
         }
-        
-        boolean matches(int cardinality) {
+
+        boolean matches(int cardinality, int totalSolutions) {
             return min <= cardinality && cardinality <= max;
         }
     }

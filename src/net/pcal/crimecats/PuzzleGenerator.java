@@ -5,12 +5,11 @@ import java.util.*;
 
 public class PuzzleGenerator {
 
-    private static final boolean DEBUG = false
-            ;
+    private static final boolean DEBUG = false;
 
     public static void main(String[] args) {
         final PuzzleGenerator pg = new PuzzleGenerator();
-        final Puzzle puzzle = pg.generate();
+        final Puzzle puzzle = pg.generate(PuzzleDifficulty.INTERMEDIATE);
         final PrintWriter out = new PrintWriter(System.out);
         puzzle.printPuzzle(out);
         puzzle.printSolution(out);
@@ -27,22 +26,26 @@ public class PuzzleGenerator {
         allClues = generateMatchedClueLUT(allSolutions, RelativeClue.createRelativeClues());
     }
 
-    public Puzzle generate() {
+    public Puzzle generate(PuzzleDifficulty difficulty) {
         while (true) {
             try {
-                return generateOne(PuzzleDifficulty.INTERMEDIATE);
+                return generateOne(difficulty);
             } catch (IllegalStateException tryagain) {
+                System.out.println("...still thinking...");
             }
         }
     }
 
     private Puzzle generateOne(PuzzleDifficulty difficulty) {
-        final int puzzleSolutionIndex = rand(allSolutions.getCount());
+        final int solutionCount = allSolutions.getCount();
+        final int puzzleSolutionIndex = rand(solutionCount);
         final Set<MatchedClue> availableClues = new HashSet<>();
         for (final MatchedClue mc : this.allClues) {
-            if (mc.getSolvedSolutions().get(puzzleSolutionIndex)) {
-                availableClues.add(mc);
+            if (!mc.getSolvedSolutions().get(puzzleSolutionIndex)) {
+                // filter out any clues that don't match the solution
+                continue;
             }
+            availableClues.add(mc);
         }
         debug("Solution Index = " + puzzleSolutionIndex + ", " + availableClues.size() + " matching clues identified");
         final Position crime = Position.values()[rand(Position.values().length)];
@@ -52,13 +55,13 @@ public class PuzzleGenerator {
         int safety = 0;
         for (int i = 0; i < clueCount; i++) {
             if (i == 0) {
-                final MatchedClue clue = getRandomClue(availableClues, difficulty.getClueDifficulty(i));
+                final MatchedClue clue = getRandomClue(solutionCount, availableClues, difficulty.getClueDifficulty(i));
                 puzzleClues.add(clue);
             } else {
                 final BitSet currentSols = getSolutions(puzzleClues);
                 while (true) {
                     removeInvalidCandidates(puzzleClues, availableClues);
-                    final MatchedClue clue = getRandomClue(availableClues, difficulty.getClueDifficulty(i));
+                    final MatchedClue clue = getRandomClue(solutionCount, availableClues, difficulty.getClueDifficulty(i));
                     debug("cardinality=" + clue.getSolvedSolutions().cardinality() + " '" + clue.getClue() + "'");
                     puzzleClues.add(clue);
                     final BitSet proposedSols = ((BitSet) currentSols.clone());
@@ -73,7 +76,6 @@ public class PuzzleGenerator {
                         }
                     }
                     if (safety++ > SAFETY_LIMIT) {
-                        System.out.println("hit safety limit, retrying");
                         throw new IllegalStateException("failed to find a solution");
                     }
                     puzzleClues.remove(clue);
@@ -88,19 +90,26 @@ public class PuzzleGenerator {
         return new Puzzle(crime, this.allSolutions.getSolution(puzzleSolutionIndex), finalPuzzleClues);
     }
 
-    private MatchedClue getRandomClue(final Set<MatchedClue> clues, final PuzzleDifficulty.ClueDifficulty d) {
+    private MatchedClue getRandomClue(final int solutionCount, final Set<MatchedClue> cluesOriginal, final PuzzleDifficulty.ClueDifficulty d) {
+        final List<MatchedClue> clues = new ArrayList<>(cluesOriginal);
+        Collections.shuffle(clues);
         final Iterator<MatchedClue> i = clues.iterator();
-        int n = rand(clues.size());
-        while(--n > 0) {
-            i.next();
+        while(i.hasNext()) {
+            final MatchedClue clue = i.next();
+            if (!d.matches(clue.getSolvedSolutions().cardinality(), solutionCount)) {
+                i.remove();
+            }
         }
-        return i.next();
+        if (clues.size() == 0){
+            throw new IllegalStateException("could not find valid clue");
+        }
+        return clues.get(rand(clues.size()));
     }
 
     private static void removeInvalidCandidates(List<MatchedClue> currentPuzzleClues, Set<MatchedClue> candidates) {
         final BitSet currentSolutions = getSolutions(currentPuzzleClues);
         final int currentCardinality = currentSolutions.cardinality();
-        final BitSet[] exclusives = getSolitionsExclusiveOfEach(currentPuzzleClues);
+        final BitSet[] exclusives = getUniqueSolutionsForEach(currentPuzzleClues);
         final Iterator<MatchedClue> ci = candidates.iterator();
         outer:
         while(ci.hasNext()) {
@@ -139,7 +148,7 @@ public class PuzzleGenerator {
     }
 
     // return the solutions there are uniquely identified by each of the clues so far
-    private static BitSet[] getSolitionsExclusiveOfEach(List<MatchedClue> clues) {
+    private static BitSet[] getUniqueSolutionsForEach(List<MatchedClue> clues) {
         final BitSet[] exclusives = new BitSet[clues.size()];
         for (int i = 0; i < clues.size(); i++) {
             exclusives[i] = (BitSet)clues.get(i).getSolvedSolutions().clone();
